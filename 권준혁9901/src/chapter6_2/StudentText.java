@@ -1,0 +1,14 @@
+package chapter6_2;
+
+public class StudentText {
+
+	public static void main(String[] args) {
+		Student s1 = new Student();
+
+//		s1.setStudent_type("´ëÇÐ»ý");
+//		String type = s1.getStudent_type();
+//		System.out.println(type);
+
+	}
+
+}
