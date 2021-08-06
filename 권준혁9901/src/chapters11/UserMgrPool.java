@@ -80,8 +80,84 @@ public class UserMgrPool {
 		return bean;
 	}
 
-}
+	public void updateUserBean(UserBean userBean, String pwd, String name, String phone) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		String sql = null;
+		
+		try {
+			con = pool.getConnection();
+			if(pwd.length() == 0) {
+				if(name.length() == 0) {
+					sql = "update user_mst set user_phone = ? where user_id = ?";
+					pstmt = con.prepareStatement(sql);
+					pstmt.setString(1, phone);
+					pstmt.setString(2, userBean.getUser_id());
+				} else if(phone.length() == 0) {
+						sql = "update user_mst set user_name = ? where user_id = ?";
+						pstmt = con.prepareStatement(sql);
+						pstmt.setString(1, name);
+						pstmt.setString(2, userBean.getUser_id());
+				} else {
+					sql = "update user_mst set user_phone = ?, user_name = ? where user_id = ?";
+					pstmt = con.prepareStatement(sql);
+					pstmt.setString(1, name);
+					pstmt.setString(1, phone);
+					pstmt.setString(2, userBean.getUser_id());
+				} 
+			} else {
+				if(name.length() == 0) {
+				sql = "update user_mst set user pwd?, user_phone = ? where user_id = ?";
+				pstmt = con.prepareStatement(sql);
+				pstmt.setString(1, pwd);
+				pstmt.setString(2, phone);
+				pstmt.setString(3, userBean.getUser_id());
+				} else if(phone.length() == 0) {
+					sql = "update user_mst set user pwd?, user_name = ? where user_id = ?";
+					pstmt = con.prepareStatement(sql);
+					pstmt.setString(1, pwd);
+					pstmt.setString(2, name);
+					pstmt.setString(3, userBean.getUser_id());
+				} else {
+				sql = "update user_mst set user pwd?, user_phone = ?, user_name = ? where user_id = ?";
+				pstmt = con.prepareStatement(sql);
+				pstmt.setString(1, pwd);
+				pstmt.setString(2, name);
+				pstmt.setString(3, phone);
+				pstmt.setString(4, userBean.getUser_id());
+				}
+			}
+		}catch(SQLException sqlEx) {
+			System.out.println(sqlEx);
+		}catch(Exception e) {
+			e.printStackTrace();
+		}finally {
+			pool.freeConnection(con, pstmt);
+		}
+		
+	}
 
+ public UserBean deleteUserBean(String id) {
+	Connection con = null;
+	PreparedStatement pstmt = null;
+	String sql = null;
+	
+	try {
+		con = pool.getConnection();
+		sql = "delete from user_mst where user_id = ?";
+				pstmt = con.prepareStatement(sql);
+				pstmt.setString(1, id);
+				pstmt.executeUpdate();
+	}catch(SQLException sqlEx) {
+		System.out.println(sqlEx);
+	}catch(Exception e) {
+		e.printStackTrace();
+	}finally {
+		pool.freeConnection(con, pstmt);
+	}
+	
+ }
+}
 
 
 

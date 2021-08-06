@@ -42,6 +42,11 @@ public class Emp extends JFrame {
 	private JTextField updateNameText;
 	private JTextField updatePhoneText;
 
+	// userInfoLabel
+	private JLabel userInfoId;
+	private JLabel userInfoName;
+	private JLabel userInfoPhone;
+	
 	/**
 	 * Launch the application.
 	 */
@@ -132,6 +137,8 @@ public class Emp extends JFrame {
 					loginUserBean = userMgrPool.getUserBean(idText, pwdText);
 					welcomMessage.setText(loginUserBean.getUser_name() + "님 환영합니다.");
 					mainCard.show(mainPanel, "name_20618782754200");
+					idField.setText("");
+					pwdField.setText("");
 					return;
 				}
 				JOptionPane.showMessageDialog(null, "사용자 계정 정보가 잘 못 되었습니다.", "경고", JOptionPane.PLAIN_MESSAGE);
@@ -158,8 +165,6 @@ public class Emp extends JFrame {
 		logoutButton.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				idField.setText("");
-				pwdField.setText("");
 				loginUserBean = null;
 				mainCard.show(mainPanel, "name_20595610598400");
 			}
@@ -170,6 +175,16 @@ public class Emp extends JFrame {
 		welcomMessage = new JLabel("New label");
 		welcomMessage.setBounds(12, 10, 284, 15);
 		homeView.add(welcomMessage);
+		
+		JButton btnNewButton = new JButton("\uB9C8\uC774\uD398\uC774\uC9C0");
+		btnNewButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				mainCard.show(mainPanel, "name_12736128941400");
+			}
+		});
+		btnNewButton.setBounds(836, 10, 97, 23);
+		homeView.add(btnNewButton);
 		
 		DefaultListModel<String> model = new DefaultListModel<String>();
 		model.add(0, "김준일");
@@ -374,14 +389,62 @@ public class Emp extends JFrame {
 		userInfo.add(userInfoPhone);
 		
 		JButton updateSubmitButton = new JButton("\uC218\uC815\uD558\uAE30");
+		updateSubmitButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				String pwd = updatePwdText.getText();
+				String rePwd = updateRePwdText.getText();
+				String name = updateNameText.getText();
+				String phone = updatePhoneText.getText();
+				
+				if(pwd.length() == 0 && rePwd.length() == 0 && 
+						name.length() == 0 && 
+						phone.length() == 0 ) {
+					JOptionPane.showMessageDialog(null, "수정할 내용이 없습니다.", "수정 오류", JOptionPane.INFORMATION_MESSAGE);
+				} else if(pwd.length() != 0 && rePwd.length() != 0) {
+					JOptionPane.showMessageDialog(null, "수정할 비밀번호가 일치하지 않습니다.", "수정 오류", JOptionPane.ERROR_MESSAGE);
+				} else {
+					UserMgrPool mgrPool = new UserMgrPool();
+					mgrPool.updateUserBean(loginUserBean, rePwd, name, phone);
+					String originId = loginUserBean.getUser_id();
+					String originPwd = loginUserBean.getUser_pwd();
+					if(pwd.length() == 0)
+					loginUserBean = mgrPool.getUserBean(originId, rePwd);
+					JOptionPane.showMessageDialog(null, "회원 정보 수정 완료.", "수정 완료", JOptionPane.INFORMATION_MESSAGE);
+					welcomMessage.setText(loginUserBean.getUser_name());
+					mainCard.show(mainPanel, "name_20618782754200");
+				}
+				
+			}
+		});
 		updateSubmitButton.setBounds(551, 350, 325, 38);
 		userInfo.add(updateSubmitButton);
 		
 		JButton deleteSubmitButton = new JButton("\uD68C\uC6D0\uD0C8\uD1F4");
+		deleteSubmitButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				int result = JOptionPane.showConfirmDialog(null, "정말 계정을 삭제하시겠습니까?", "회원탈퇴", JOptionPane.YES_NO_CANCEL_OPTION);
+				if(result == JOptionPane.CLOSED_OPTION) {
+					UserMgrPool userMgrPool = new UserMgrPool();
+					userMgrPool.deleteUserBean(loginUserBean.getUser_id());
+					loginUserBean = null;
+					mainCard.show(mainPanel, "name_20595610598400");
+				}
+				
+				
+			}
+		});
 		deleteSubmitButton.setBounds(88, 350, 325, 38);
 		userInfo.add(deleteSubmitButton);
 		
 		JButton userInfoHomeButton = new JButton("\uBA54\uC778\uD654\uBA74");
+		userInfoHomeButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				mainCard.show(mainPanel, "name_20618782754200");
+			}
+		});
 		userInfoHomeButton.setBounds(854, 440, 97, 23);
 		userInfo.add(userInfoHomeButton);
 	}
