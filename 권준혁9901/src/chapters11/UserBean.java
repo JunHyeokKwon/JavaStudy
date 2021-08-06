@@ -1,6 +1,5 @@
 package chapters11;
 
-
 public class UserBean {
 	private String user_id;
 	private String user_pwd;
@@ -31,5 +30,6 @@ public class UserBean {
 	public void setUser_phone(String user_phone) {
 		this.user_phone = user_phone;
 	}
+
 	
 }

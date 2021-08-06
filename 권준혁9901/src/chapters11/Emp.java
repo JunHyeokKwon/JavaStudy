@@ -3,8 +3,6 @@ package chapters11;
 import java.awt.CardLayout;
 import java.awt.EventQueue;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -18,6 +16,12 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
+import javax.swing.JList;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.AbstractListModel;
+import javax.swing.DefaultListModel;
+import javax.swing.ListSelectionModel;
 
 public class Emp extends JFrame {
 
@@ -25,11 +29,19 @@ public class Emp extends JFrame {
 	private JTextField idField;
 	private JPasswordField pwdField;
 	private JTextField joinIdField;
-	private JPasswordField joinPwdField;
-	private JPasswordField joinRePwdField;
 	private JTextField joinNameField;
 	private JTextField joinPhoneField;
+	private JPasswordField joinPwdField;
+	private JPasswordField joinRePwdField;
+	private JLabel welcomMessage;
+	
 	private boolean joinIdCheckFlag = false;
+	private UserBean loginUserBean = null;
+	private JPasswordField updatePwdText;
+	private JPasswordField updateRePwdText;
+	private JTextField updateNameText;
+	private JTextField updatePhoneText;
+
 	/**
 	 * Launch the application.
 	 */
@@ -51,76 +63,61 @@ public class Emp extends JFrame {
 	 */
 	public Emp() {
 		ArrayList<UserBean> userList = new ArrayList<UserBean>();
-		String id = "junil";
-		String pwd = "1234";
-		
-		UserBean user1 = new UserBean();
-		user1.setUser_id("junil");
-		user1.setUser_name("1234");
-		user1.setUser_name("김준일");
-		user1.setUser_phone("010-9988-1916");
-		
-		
-		userList.add(user1);
 		
 		CardLayout mainCard = new CardLayout();
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 1000, 500);
+		setBounds(100, 100, 989, 522);
 		mainPanel = new JPanel();
 		mainPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(mainPanel);
 		mainPanel.setLayout(mainCard);
 		
 		JPanel mainView = new JPanel();
-		mainPanel.add(mainView, "name_1578755357200"); // name_1578755357200은 키값
+		mainPanel.add(mainView, "name_20595610598400");
 		mainView.setLayout(null);
 		
 		JLabel mainTitleLabel = new JLabel("\uC0AC\uC6D0\uAD00\uB9AC \uD504\uB85C\uADF8\uB7A8");
 		mainTitleLabel.setFont(new Font("굴림", Font.BOLD, 30));
 		mainTitleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		mainTitleLabel.setBounds(250, 150, 500, 50);
+		mainTitleLabel.setBounds(296, 74, 373, 62);
 		mainView.add(mainTitleLabel);
 		
 		JButton mainStartButton = new JButton("\uD504\uB85C\uADF8\uB7A8 \uC2DC\uC791");
-		mainStartButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
 		mainStartButton.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				mainCard.show(mainPanel, "name_1616150673700");
+				mainCard.show(mainPanel, "name_20615607195200");
 			}
 		});
-		mainStartButton.setBounds(425, 300, 150, 50);
+		mainStartButton.setBounds(372, 250, 219, 47);
 		mainView.add(mainStartButton);
 		
 		JPanel loginView = new JPanel();
-		mainPanel.add(loginView, "name_1616150673700");
+		mainPanel.add(loginView, "name_20615607195200");
 		loginView.setLayout(null);
 		
 		JLabel idLabel = new JLabel("\uC544\uC774\uB514");
-		idLabel.setBounds(300, 220, 75, 15);
+		idLabel.setBounds(248, 180, 57, 15);
 		loginView.add(idLabel);
 		
 		JLabel pwdLabel = new JLabel("\uBE44\uBC00\uBC88\uD638");
-		pwdLabel.setBounds(300, 250, 75, 15);
+		pwdLabel.setBounds(248, 235, 57, 15);
 		loginView.add(pwdLabel);
 		
 		idField = new JTextField();
-		idField.setBounds(375, 220, 200, 20);
+		idField.setBounds(317, 171, 277, 33);
 		loginView.add(idField);
 		idField.setColumns(10);
 		
 		pwdField = new JPasswordField();
-		pwdField.setBounds(375, 250, 200, 20);
+		pwdField.setBounds(317, 226, 277, 33);
 		loginView.add(pwdField);
 		
 		JLabel loginTitle = new JLabel("\uB85C\uADF8\uC778 \uD398\uC774\uC9C0");
 		loginTitle.setFont(new Font("굴림", Font.BOLD, 30));
 		loginTitle.setHorizontalAlignment(SwingConstants.CENTER);
-		loginTitle.setBounds(250, 50, 500, 50);
+		loginTitle.setBounds(365, 73, 229, 33);
 		loginView.add(loginTitle);
 		
 		JButton loginButton = new JButton("\uB85C\uADF8\uC778");
@@ -130,125 +127,133 @@ public class Emp extends JFrame {
 				String idText = idField.getText();
 				String pwdText = pwdField.getText();
 				
-				for(UserBean userBean : userList) {
-					if(userBean.getUser_id().equals(idText) && userBean.getUser_pwd().equals(pwdText)) {
-						mainCard.show(mainPanel, "name_1617231951000");
-						return;
-					}
+				UserMgrPool userMgrPool = new UserMgrPool();
+				if(userMgrPool.loginCheck(idText, pwdText)) {
+					loginUserBean = userMgrPool.getUserBean(idText, pwdText);
+					welcomMessage.setText(loginUserBean.getUser_name() + "님 환영합니다.");
+					mainCard.show(mainPanel, "name_20618782754200");
+					return;
 				}
-				if(idText.equals(id) && pwdText.equals(pwd)) {
-					mainCard.show(mainPanel, "name_1617231951000");
-				} else {
-					JOptionPane.showMessageDialog(null, "사용자 계정 정보가 잘못되었습니다.", "경고", JOptionPane.PLAIN_MESSAGE);
-				}
-				idField.setText("");
-				pwdField.setText("");
+				JOptionPane.showMessageDialog(null, "사용자 계정 정보가 잘 못 되었습니다.", "경고", JOptionPane.PLAIN_MESSAGE);
 			}
 		});
-		loginButton.setBounds(600, 220, 100, 50);
+		loginButton.setBounds(617, 171, 97, 88);
 		loginView.add(loginButton);
 		
 		JButton joinButton = new JButton("\uD68C\uC6D0\uAC00\uC785");
 		joinButton.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				mainCard.show(mainPanel, "name_1625150611500");
+				mainCard.show(mainPanel, "name_20621601462100");
 			}
 		});
-		joinButton.setBounds(440, 300, 100, 25);
+		joinButton.setBounds(432, 329, 97, 23);
 		loginView.add(joinButton);
 		
 		JPanel homeView = new JPanel();
-		mainPanel.add(homeView, "name_1617231951000");
+		mainPanel.add(homeView, "name_20618782754200");
 		homeView.setLayout(null);
 		
 		JButton logoutButton = new JButton("\uB85C\uADF8\uC544\uC6C3");
 		logoutButton.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				JOptionPane.showMessageDialog(null, "로그아웃 되었습니다. 메인화면으로 돌아갑니다.", "알림", JOptionPane.PLAIN_MESSAGE);
-				mainCard.show(mainPanel, "name_1578755357200");
+				idField.setText("");
+				pwdField.setText("");
+				loginUserBean = null;
+				mainCard.show(mainPanel, "name_20595610598400");
 			}
 		});
-		logoutButton.setBounds(865, 420, 100, 25);
+		logoutButton.setBounds(836, 427, 97, 23);
 		homeView.add(logoutButton);
 		
+		welcomMessage = new JLabel("New label");
+		welcomMessage.setBounds(12, 10, 284, 15);
+		homeView.add(welcomMessage);
+		
+		DefaultListModel<String> model = new DefaultListModel<String>();
+		model.add(0, "김준일");
+		
+		
+		
 		JPanel joinView = new JPanel();
-		mainPanel.add(joinView, "name_1625150611500");
+		mainPanel.add(joinView, "name_20621601462100");
 		joinView.setLayout(null);
+		
+		joinIdField = new JTextField();
+		joinIdField.setBounds(399, 112, 153, 30);
+		joinView.add(joinIdField);
+		joinIdField.setColumns(10);
+		
+		joinNameField = new JTextField();
+		joinNameField.setColumns(10);
+		joinNameField.setBounds(399, 275, 239, 30);
+		joinView.add(joinNameField);
+		
+		joinPhoneField = new JTextField();
+		joinPhoneField.setColumns(10);
+		joinPhoneField.setBounds(399, 329, 239, 30);
+		joinView.add(joinPhoneField);
+		
+		joinPwdField = new JPasswordField();
+		joinPwdField.setBounds(399, 162, 239, 30);
+		joinView.add(joinPwdField);
+		
+		joinRePwdField = new JPasswordField();
+		joinRePwdField.setBounds(399, 216, 239, 30);
+		joinView.add(joinRePwdField);
+		
+		JLabel joinIdLabel = new JLabel("\uC544\uC774\uB514");
+		joinIdLabel.setBounds(313, 119, 57, 15);
+		joinView.add(joinIdLabel);
+		
+		JLabel joinPwdLabel = new JLabel("\uBE44\uBC00\uBC88\uD638");
+		joinPwdLabel.setBounds(313, 169, 57, 15);
+		joinView.add(joinPwdLabel);
+		
+		JLabel joinRePwdLabel = new JLabel("\uBE44\uBC00\uBC88\uD638 \uD655\uC778");
+		joinRePwdLabel.setBounds(313, 223, 84, 15);
+		joinView.add(joinRePwdLabel);
+		
+		JLabel joinNameLabel = new JLabel("\uC774\uB984");
+		joinNameLabel.setBounds(313, 282, 57, 15);
+		joinView.add(joinNameLabel);
+		
+		JLabel joinPhoneLabel = new JLabel("\uC5F0\uB77D\uCC98");
+		joinPhoneLabel.setBounds(313, 336, 57, 15);
+		joinView.add(joinPhoneLabel);
 		
 		JLabel joinTitle = new JLabel("\uD68C\uC6D0\uAC00\uC785");
 		joinTitle.setHorizontalAlignment(SwingConstants.CENTER);
 		joinTitle.setFont(new Font("굴림", Font.BOLD, 30));
-		joinTitle.setBounds(250, 50, 500, 50);
+		joinTitle.setBounds(385, 22, 200, 42);
 		joinView.add(joinTitle);
-		
-		JLabel joinIdLabel = new JLabel("\uC544\uC774\uB514");
-		joinIdLabel.setBounds(328, 112, 100, 30);
-		joinView.add(joinIdLabel);
-		
-		joinIdField = new JTextField();
-		joinIdField.setColumns(10);
-		joinIdField.setBounds(412, 112, 100, 30);
-		joinView.add(joinIdField);
-		
-		JLabel joinPwdLabel = new JLabel("\uBE44\uBC00\uBC88\uD638");
-		joinPwdLabel.setBounds(328, 150, 100, 30);
-		joinView.add(joinPwdLabel);
-		
-		joinPwdField = new JPasswordField();
-		joinPwdField.setBounds(412, 150, 200, 30);
-		joinView.add(joinPwdField);
-		
-		JLabel joinRePwdLabel = new JLabel("\uBE44\uBC00\uBC88\uD638 \uD655\uC778");
-		joinRePwdLabel.setBounds(328, 190, 100, 30);
-		joinView.add(joinRePwdLabel);
-		
-		joinRePwdField = new JPasswordField();
-		joinRePwdField.setBounds(412, 190, 200, 30);
-		joinView.add(joinRePwdField);
-		
-		JLabel joinNameLabel = new JLabel("\uC774\uB984");
-		joinNameLabel.setBounds(328, 230, 100, 30);
-		joinView.add(joinNameLabel);
-		
-		joinNameField = new JTextField();
-		joinNameField.setBounds(412, 230, 200, 30);
-		joinView.add(joinNameField);
-		
-		JLabel joinPhoneLabel = new JLabel("\uC5F0\uB77D\uCC98");
-		joinPhoneLabel.setBounds(328, 270, 100, 30);
-		joinView.add(joinPhoneLabel);
-		
-		joinPhoneField = new JTextField();
-		joinPhoneField.setBounds(412, 270, 200, 30);
-		joinView.add(joinPhoneField);
 		
 		JButton idCheckButton = new JButton("\uC911\uBCF5\uD655\uC778");
 		idCheckButton.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				String joinIdText = joinIdField.getText();
+				JoinMgrPool joinMgrPool = new JoinMgrPool();
+				
 				if(joinIdText.length() != 0) {
-					for(UserBean userBean : userList) {
-						if(userBean.getUser_id().equals(joinIdText)) {
-							JOptionPane.showMessageDialog(null, "중복된 아이디입니다.", "경고", JOptionPane.WARNING_MESSAGE);
-							joinIdText = "";
-							return;
-						}
+					if(joinMgrPool.idCheck(joinIdText)) {
+						JOptionPane.showMessageDialog(null, "가입할 수 없는 아이디입니다.", "경고", JOptionPane.WARNING_MESSAGE);
+						return;
 					}
-					joinIdCheckFlag = true;
 					JOptionPane.showMessageDialog(null, joinIdText + "는 사용 가능한 아이디입니다.", "확인", JOptionPane.INFORMATION_MESSAGE);
-				} else {
+					joinIdCheckFlag = true;
+				}else {
 					JOptionPane.showMessageDialog(null, "공백은 입력할 수 없습니다.", "경고", JOptionPane.WARNING_MESSAGE);
 				}
+				
 			}
 		});
-		idCheckButton.setBounds(515, 111, 100, 30);
+		idCheckButton.setBounds(554, 112, 84, 30);
 		joinView.add(idCheckButton);
 		
-		JButton idCheckButton_1 = new JButton("\uAC00\uC785\uD558\uAE30");
-		idCheckButton_1.addMouseListener(new MouseAdapter() {
+		JButton joinSubmitButton = new JButton("\uAC00\uC785\uD558\uAE30");
+		joinSubmitButton.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				String joinIdText = joinIdField.getText();
@@ -256,39 +261,128 @@ public class Emp extends JFrame {
 				String joinRePwdText = joinRePwdField.getText();
 				String joinNameText = joinNameField.getText();
 				String joinPhoneText = joinPhoneField.getText();
-				
 				if(joinIdCheckFlag == false) {
-					JOptionPane.showMessageDialog(null, "아이디 중복확인하여 주시기 바랍니다.", "경고", JOptionPane.WARNING_MESSAGE);
-					
+					JOptionPane.showMessageDialog(null, "아이디 중복확인이 되지 않았습니다.", "경고", JOptionPane.WARNING_MESSAGE);
 				}else if(joinPwdText.length() == 0) {
-					JOptionPane.showMessageDialog(null, "비밀번호를 입력하여 주시기 바랍니다.", "경고", JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(null, "비밀번호는 공백일 수 없습니다.", "경고", JOptionPane.WARNING_MESSAGE);
 				}else if(joinRePwdText.length() == 0) {
-					JOptionPane.showMessageDialog(null, "비밀번호 확인을 입력하여 주시기 바랍니다.", "경고", JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(null, "비밀번호 확인은 공백일 수 없습니다.", "경고", JOptionPane.WARNING_MESSAGE);
 				}else if(joinNameText.length() == 0) {
-					JOptionPane.showMessageDialog(null, "이름을 입력하여 주시기 바랍니다.", "경고", JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(null, "이름은 공백일 수 없습니다.", "경고", JOptionPane.WARNING_MESSAGE);
 				}else if(joinPhoneText.length() == 0) {
-					JOptionPane.showMessageDialog(null, "연락처를 입력하여 주시기 바랍니다.", "경고", JOptionPane.WARNING_MESSAGE);
-				}else if(!joinPwdText.equals(joinRePwdText)) {
-					JOptionPane.showMessageDialog(null, "비밀번호가 일치 하지 않습니다.", "경고", JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(null, "연락처는 공백일 수 없습니다.", "경고", JOptionPane.WARNING_MESSAGE);
+				}else if(!joinPwdText.equals(joinRePwdText)){
+					JOptionPane.showMessageDialog(null, "비밀번호가 일치하지 않습니다.", "경고", JOptionPane.WARNING_MESSAGE);
 				}else {
 					UserBean userBean = new UserBean();
 					userBean.setUser_id(joinIdText);
-					userBean.setUser_pwd(joinPwdText);
+					userBean.setUser_pwd(joinRePwdText);
 					userBean.setUser_name(joinNameText);
 					userBean.setUser_phone(joinPhoneText);
-					userList.add(userBean);
-					joinIdField.setText("");
-					joinPwdField.setText("");
-					joinRePwdField.setText("");
-					joinNameField.setText("");
-					joinPhoneField.setText("");
-					joinIdCheckFlag = false;
-					JOptionPane.showMessageDialog(null, "회원가입에 성공하였습니다.", "회원가입 성공", JOptionPane.INFORMATION_MESSAGE);
-					mainCard.show(mainPanel, "name_1616150673700");
+					JoinMgrPool joinMgrPool = new JoinMgrPool();
+					if(joinMgrPool.joinSubmit(userBean)) {
+						joinIdField.setText("");
+						joinPwdField.setText("");
+						joinRePwdField.setText("");
+						joinNameField.setText("");
+						joinPhoneField.setText("");
+						joinIdCheckFlag = false;
+						JOptionPane.showMessageDialog(null, "축하합니다.\n회원가입에 성공하였습니다.", "회원가입 성공", JOptionPane.INFORMATION_MESSAGE);
+						mainCard.show(mainPanel, "name_20615607195200");
+					}else {
+						JOptionPane.showMessageDialog(null, "DataBase에 정보를 추가하는 중에 오류가 발생하였습니다.", "DB_Exeption", JOptionPane.ERROR_MESSAGE);
+					}
 				}
+				
 			}
 		});
-		idCheckButton_1.setBounds(327, 320, 285, 30);
-		joinView.add(idCheckButton_1);
+		joinSubmitButton.setBounds(313, 383, 325, 42);
+		joinView.add(joinSubmitButton);
+		
+		JPanel userInfo = new JPanel();
+		mainPanel.add(userInfo, "name_12736128941400");
+		userInfo.setLayout(null);
+		
+		JLabel updatePwdLabel = new JLabel("\uBE44\uBC00\uBC88\uD638");
+		updatePwdLabel.setBounds(551, 124, 57, 15);
+		userInfo.add(updatePwdLabel);
+		
+		JLabel updateRePwdLabel = new JLabel("\uBE44\uBC00\uBC88\uD638 \uD655\uC778");
+		updateRePwdLabel.setBounds(551, 178, 84, 15);
+		userInfo.add(updateRePwdLabel);
+		
+		JLabel updateNameLabel = new JLabel("\uC774\uB984");
+		updateNameLabel.setBounds(551, 237, 57, 15);
+		userInfo.add(updateNameLabel);
+		
+		JLabel updatePhoneLabel = new JLabel("\uC5F0\uB77D\uCC98");
+		updatePhoneLabel.setBounds(551, 291, 57, 15);
+		userInfo.add(updatePhoneLabel);
+		
+		updatePwdText = new JPasswordField();
+		updatePwdText.setBounds(637, 117, 239, 30);
+		userInfo.add(updatePwdText);
+		
+		updateRePwdText = new JPasswordField();
+		updateRePwdText.setBounds(637, 171, 239, 30);
+		userInfo.add(updateRePwdText);
+		
+		updateNameText = new JTextField();
+		updateNameText.setColumns(10);
+		updateNameText.setBounds(637, 230, 239, 30);
+		userInfo.add(updateNameText);
+		
+		updatePhoneText = new JTextField();
+		updatePhoneText.setColumns(10);
+		updatePhoneText.setBounds(637, 284, 239, 30);
+		userInfo.add(updatePhoneText);
+		
+		JLabel updateUserTitle = new JLabel("\uD68C\uC6D0\uC815\uBCF4\uC218\uC815");
+		updateUserTitle.setFont(new Font("굴림", Font.BOLD, 20));
+		updateUserTitle.setHorizontalAlignment(SwingConstants.CENTER);
+		updateUserTitle.setBounds(623, 49, 190, 30);
+		userInfo.add(updateUserTitle);
+		
+		JLabel UserInfoTitle = new JLabel("\uD68C\uC6D0\uC815\uBCF4");
+		UserInfoTitle.setHorizontalAlignment(SwingConstants.CENTER);
+		UserInfoTitle.setFont(new Font("굴림", Font.BOLD, 20));
+		UserInfoTitle.setBounds(145, 49, 190, 30);
+		userInfo.add(UserInfoTitle);
+		
+		JLabel userInfoIdLabel = new JLabel("\uC544\uC774\uB514");
+		userInfoIdLabel.setBounds(135, 124, 57, 15);
+		userInfo.add(userInfoIdLabel);
+		
+		JLabel userInfoNameLabel = new JLabel("\uC774\uB984");
+		userInfoNameLabel.setBounds(135, 168, 57, 15);
+		userInfo.add(userInfoNameLabel);
+		
+		JLabel userInfoPhoneLabel = new JLabel("\uC5F0\uB77D\uCC98");
+		userInfoPhoneLabel.setBounds(135, 213, 57, 15);
+		userInfo.add(userInfoPhoneLabel);
+		
+		JLabel userInfoId = new JLabel("New label");
+		userInfoId.setBounds(204, 124, 57, 15);
+		userInfo.add(userInfoId);
+		
+		JLabel userInfoName = new JLabel("New label");
+		userInfoName.setBounds(204, 168, 57, 15);
+		userInfo.add(userInfoName);
+		
+		JLabel userInfoPhone = new JLabel("New label");
+		userInfoPhone.setBounds(204, 213, 57, 15);
+		userInfo.add(userInfoPhone);
+		
+		JButton updateSubmitButton = new JButton("\uC218\uC815\uD558\uAE30");
+		updateSubmitButton.setBounds(551, 350, 325, 38);
+		userInfo.add(updateSubmitButton);
+		
+		JButton deleteSubmitButton = new JButton("\uD68C\uC6D0\uD0C8\uD1F4");
+		deleteSubmitButton.setBounds(88, 350, 325, 38);
+		userInfo.add(deleteSubmitButton);
+		
+		JButton userInfoHomeButton = new JButton("\uBA54\uC778\uD654\uBA74");
+		userInfoHomeButton.setBounds(854, 440, 97, 23);
+		userInfo.add(userInfoHomeButton);
 	}
 }
