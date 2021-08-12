@@ -137,24 +137,23 @@ public class UserMgrPool {
 		
 	}
 
- public UserBean deleteUserBean(String id) {
-	Connection con = null;
-	PreparedStatement pstmt = null;
-	String sql = null;
-	
-	try {
-		con = pool.getConnection();
-		sql = "delete from user_mst where user_id = ?";
-				pstmt = con.prepareStatement(sql);
-				pstmt.setString(1, id);
-				pstmt.executeUpdate();
-	}catch(SQLException sqlEx) {
-		System.out.println(sqlEx);
-	}catch(Exception e) {
-		e.printStackTrace();
-	}finally {
-		pool.freeConnection(con, pstmt);
-	}
+	public void deleteUserBean(String id) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		String sql = null;
+		try {
+			con = pool.getConnection();
+			sql = "delete from user_mst where user_id = ?";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, id);
+			pstmt.executeUpdate();
+		}catch(SQLException sqlEx) {
+			System.out.println(sqlEx);
+		}catch(Exception e) {
+			e.printStackTrace();
+		}finally {
+			pool.freeConnection(con, pstmt);
+		}
 	
  }
 }
